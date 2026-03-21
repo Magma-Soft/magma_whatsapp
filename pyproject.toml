@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "magma_whatsapp"
+version = "0.1.0"
+description = "Simple WhatsApp Cloud API client"
+authors = [
+    { name = "Daniel Pinto", email = "daniel.pinto@magmaventures.co" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "requests>=2.31.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["magma_whatsapp*"]
