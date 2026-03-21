@@ -51,12 +51,23 @@ class WhatsAppWebhookProcessor:
                 return message.get("text", {}).get("body", "")
 
         return ""
+    
+    def get_media_info(self, payload: dict) -> dict:
+        if payload.get("messages", None):
+            message = payload["messages"][0]
+            if message.get("type") in ["image", "video", "document"]:
+                return {
+                    "id": message.get(message["type"], {}).get("id"),
+                    "mime_type": message.get(message["type"], {}).get("mime_type"),
+                }
+        return {}
 
     def get_message_info(self, payload: dict) -> dict:
         return {
             "id": self.get_message_id(payload),
             "type": self.get_message_type(payload),
-            "content": self.get_content(payload)
+            "content": self.get_content(payload),
+            "media_info": self.get_media_info(payload)
         }
 
     def get_inbound_message_data(self, payload: dict) -> dict:
