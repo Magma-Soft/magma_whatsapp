@@ -42,7 +42,7 @@ class WhatsAppWebhookProcessor:
             return payload["statuses"][0].get("status")
         return "unknown"
     
-    def get_caption(self, payload: dict) -> str:
+    def get_content(self, payload: dict) -> str:
         if payload.get("messages", None):
             message = payload["messages"][0]
             if message.get("type") in ["image", "video", "document"]:
@@ -52,12 +52,17 @@ class WhatsAppWebhookProcessor:
 
         return ""
 
+    def get_message_info(self, payload: dict) -> dict:
+        return {
+            "id": self.get_message_id(payload),
+            "type": self.get_message_type(payload),
+            "content": self.get_content(payload)
+        }
+
     def get_inbound_message_data(self, payload: dict) -> dict:
         return {
-            "message_id": self.get_message_id(payload),
-            "contact_info": self.get_contact_info(payload),
-            "message_type": self.get_message_type(payload),
-            "caption": self.get_caption(payload),
+            "contact": self.get_contact_info(payload),
+            "message": self.get_message_info(payload),
         }
 
     def get_outbound_message_data(self, payload: dict) -> dict:
