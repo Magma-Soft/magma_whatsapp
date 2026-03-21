@@ -74,5 +74,5 @@ class WhatsAppWebhookProcessor:
                 "inbound_data": self.get_inbound_message_data(value) if direction == "inbound" else None,
                 "outbound_data": self.get_outbound_message_data(value) if direction == "outbound" else None
             }
-            print(data)
-            print("Received webhook data:", data)
+            return data
+        
