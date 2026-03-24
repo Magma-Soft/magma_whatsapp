@@ -71,14 +71,25 @@ class WhatsAppMedia(MediaProcessor):
         )
         return content
 
-    # def download_media(self, media_id: str):
-    #     """
-    #     Download the media content for a specific media item by its ID.
+    def upload_media(self, file_path: str, media_type: str):
+        """
+        Upload a media file to WhatsApp and obtain a media ID.
 
-    #     :param media_id: The unique identifier of the media item.
-    #     :return: The binary content of the media file.
-    #     """
-    #     return self.request(
-    #         method="GET",
-    #         endpoint="/%s/content" % media_id
-    #     )
+        :param file_path: The local path to the media file to be uploaded.
+        :param media_type: The type of media ("image", "audio", "document").
+        :return: The response containing the media ID returned by the WhatsApp API.
+        """
+        if media_type not in ["image", "audio", "document"]:
+            raise ValueError("Invalid media type: %s" % media_type)
+
+        with open(file_path, "rb") as f:
+            files = {
+                "file": (file_path, f, mimetypes.guess_type(file_path)[0] or "application/octet-stream")
+            }
+            response = self.request(
+                method="POST",
+                endpoint="/%s/media" % self.config.phone_number_id,
+                files=files,
+                payload={"type": media_type}
+            )
+        return response
