@@ -5,17 +5,16 @@ from uuid import uuid4
 
 class MediaProcessor:
 
-    def __init__(self):
-        self.MIME_EXTENSION_MAP = {
-            "image/jpeg": ".jpg",
-            "image/jpg": ".jpg",
-            "image/png": ".png",
-            "image/webp": ".webp",
-            "image/gif": ".gif",
-            "video/mp4": ".mp4",
-            "audio/mpeg": ".mp3",
-            "application/pdf": ".pdf",
-        }
+    MIME_EXTENSION_MAP: dict[str, str] = {
+        "image/jpeg": ".jpg",
+        "image/jpg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "image/gif": ".gif",
+        "video/mp4": ".mp4",
+        "audio/mpeg": ".mp3",
+        "application/pdf": ".pdf",
+    }
 
     def extract_message_id(self, message):
         return message.get("id")
@@ -24,7 +23,7 @@ class MediaProcessor:
         if not mime_type:
             return ".bin"
 
-        extension = self.MIME_EXTENSION_MAP.get(mime_type)
+        extension = type(self).MIME_EXTENSION_MAP.get(mime_type)
         if extension:
             return extension
 
