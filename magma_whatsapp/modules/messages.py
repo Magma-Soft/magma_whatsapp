@@ -13,7 +13,7 @@ class WhatsAppMessages:
         :param message_content: The text body to send in the message.
         :return: The response returned by the WhatsApp API.
         """
-        return self.request(
+        response = self.request(
             method="POST",
             endpoint="/%s/messages" % self.config.phone_number_id,
             payload={
@@ -22,6 +22,15 @@ class WhatsAppMessages:
                 "type": "text",
                 "text": {"body": message_content}
             })
+        data = {
+            "id": response.get("contacts", [{}])[0].get("wa_id"),
+            "type": "text",
+            "data": {
+                "id": response.get("messages", [{}])[0].get("id"),
+                "caption": message_content
+            }
+        }
+        return data
 
     def send_message_media(self, recipient_id: str, media_id: str, media_type: Literal["image", "audio", "document"], caption: str = None, filename: str = None):
         """
@@ -37,7 +46,7 @@ class WhatsAppMessages:
         if media_type not in ["image", "audio", "document"]:
             raise ValueError("Invalid media type: %s" % media_type)
 
-        return self.request(
+        response = self.request(
             method="POST",
             endpoint="/%s/messages" % self.config.phone_number_id,
             payload={
@@ -51,3 +60,13 @@ class WhatsAppMessages:
                     **({"filename": filename} if filename and media_type == "document" else {}),
                 },
             })
+        data = {
+            "id": response.get("contacts", [{}])[0].get("wa_id"),
+            "type": media_type,
+            "data": {
+                "id": response.get("messages", [{}])[0].get("id"),
+                "caption": caption,
+                "filename": filename
+            }
+        }
+        return data
