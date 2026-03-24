@@ -23,10 +23,10 @@ class WhatsAppMessages:
                 "text": {"body": message_content}
             })
         data = {
-            "id": response.get("contacts", [{}])[0].get("wa_id"),
+            "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
             "type": "text",
             "data": {
-                "id": response.get("messages", [{}])[0].get("id"),
+                "wa_id": response.get("messages", [{}])[0].get("id"),
                 "caption": message_content
             }
         }
@@ -61,10 +61,10 @@ class WhatsAppMessages:
                 },
             })
         data = {
-            "id": response.get("contacts", [{}])[0].get("wa_id"),
+            "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
             "type": media_type,
             "data": {
-                "id": response.get("messages", [{}])[0].get("id"),
+                "wa_id": response.get("messages", [{}])[0].get("id"),
                 "caption": caption,
                 "filename": filename
             }
