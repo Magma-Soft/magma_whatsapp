@@ -13,6 +13,7 @@ class MediaProcessor:
         "image/gif": ".gif",
         "video/mp4": ".mp4",
         "audio/mpeg": ".mp3",
+        "audio/ogg": ".ogg",
         "application/pdf": ".pdf",
     }
 
@@ -23,11 +24,13 @@ class MediaProcessor:
         if not mime_type:
             return ".bin"
 
-        extension = type(self).MIME_EXTENSION_MAP.get(mime_type)
+        normalized = mime_type.split(";")[0].strip().lower()
+
+        extension = type(self).MIME_EXTENSION_MAP.get(normalized)
         if extension:
             return extension
 
-        guessed = mimetypes.guess_extension(mime_type)
+        guessed = mimetypes.guess_extension(normalized)
         return guessed or ".bin"
 
     def build_media_filename(self, message, mime_type):

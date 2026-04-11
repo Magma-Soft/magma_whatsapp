@@ -45,7 +45,7 @@ class WhatsAppWebhookProcessor:
     def get_content(self, payload: dict) -> str:
         if payload.get("messages", None):
             message = payload["messages"][0]
-            if message.get("type") in ["image", "video", "document"]:
+            if message.get("type") in ["image", "audio", "video", "document"]:
                 return message.get(message["type"], {}).get("caption", "")
             elif message.get("type") == "text":
                 return message.get("text", {}).get("body", "")
@@ -55,7 +55,7 @@ class WhatsAppWebhookProcessor:
     def get_media_info(self, payload: dict) -> dict:
         if payload.get("messages", None):
             message = payload["messages"][0]
-            if message.get("type") in ["image", "video", "document"]:
+            if message.get("type") in ["image", "audio", "video", "document"]:
                 return {
                     "id": message.get(message["type"], {}).get("id"),
                     "mime_type": message.get(message["type"], {}).get("mime_type"),
