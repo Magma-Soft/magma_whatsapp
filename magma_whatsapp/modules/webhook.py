@@ -77,7 +77,7 @@ class WhatsAppWebhookProcessor:
     def get_reply_info(self, payload: dict) -> dict:
         if payload.get("messages", None):
             message = payload["messages"][0]
-            if message.get("type") == "text" and message.get("context", None):
+            if message.get("context", None):
                 return {
                     "message_id": message["context"].get("id"),
                     "from": message["context"].get("from"),
