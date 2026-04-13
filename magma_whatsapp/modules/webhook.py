@@ -49,25 +49,50 @@ class WhatsAppWebhookProcessor:
                 return message.get(message["type"], {}).get("caption", "")
             elif message.get("type") == "text":
                 return message.get("text", {}).get("body", "")
+            elif message.get("type") == "reaction":
+                return message.get("reaction", {}).get("emoji", "")
 
         return ""
     
     def get_media_info(self, payload: dict) -> dict:
         if payload.get("messages", None):
             message = payload["messages"][0]
-            if message.get("type") in ["image", "audio", "video", "document"]:
+            if message.get("type") in ["sticker", "image", "audio", "video", "document"]:
                 return {
                     "id": message.get(message["type"], {}).get("id"),
                     "mime_type": message.get(message["type"], {}).get("mime_type"),
                 }
         return {}
+    
+    def get_reaction_info(self, payload: dict) -> dict:
+        if payload.get("messages", None):
+            message = payload["messages"][0]
+            if message.get("type") == "reaction":
+                return {
+                    "emoji": message.get("reaction", {}).get("emoji"),
+                    "message_id": message.get("reaction", {}).get("message_id"),
+                }
+        return {}
+    
+    def get_reply_info(self, payload: dict) -> dict:
+        if payload.get("messages", None):
+            message = payload["messages"][0]
+            if message.get("type") == "text" and message.get("context", None):
+                return {
+                    "message_id": message["context"].get("id"),
+                    "from": message["context"].get("from"),
+                }
+        return {}
+
 
     def get_message_info(self, payload: dict) -> dict:
         return {
             "id": self.get_message_id(payload),
             "type": self.get_message_type(payload),
             "content": self.get_content(payload),
-            "media_info": self.get_media_info(payload)
+            "media_info": self.get_media_info(payload),
+            "reaction_info": self.get_reaction_info(payload),
+            "reply_info": self.get_reply_info(payload),
         }
 
     def get_inbound_message_data(self, payload: dict) -> dict:
