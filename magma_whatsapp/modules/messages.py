@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import mimetypes
 from typing import Literal
 
 
@@ -31,7 +32,7 @@ class WhatsAppMessages:
             }
         }
         return data
-
+    
     def send_message_media(self, recipient_id: str, media_id: str, media_type: Literal["image", "audio", "document"], caption: str = None, filename: str = None):
         """
         Send a media message (image, audio, document) to a recipient.
@@ -70,3 +71,37 @@ class WhatsAppMessages:
             }
         }
         return data
+
+    def send_message_file(self, recipient_id: str, file, caption: str = None):
+        """
+        Send file uploaded from Django InMemoryUploadedFile
+        """
+
+        file.seek(0)
+        file_binary = file.read()
+
+        mime_type = file.content_type or mimetypes.guess_type(file.name)[0]
+
+        media_type = self._resolve_media_type(mime_type)
+
+        upload = self.upload_media(
+            file_binary=file_binary,
+            media_type=media_type,
+            mime_type=mime_type,
+            filename=file.name
+        )
+
+        media_id = upload.get("id")
+
+        if not media_id:
+            raise ValueError("Failed to upload media to WhatsApp")
+
+        response = self.send_message_media(
+            recipient_id=recipient_id,
+            media_id=media_id,
+            media_type=media_type,
+            caption=caption,
+            filename=file.name if media_type == "document" else None
+        )
+
+        return response

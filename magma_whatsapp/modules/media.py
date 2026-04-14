@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import mimetypes
 from uuid import uuid4
 
@@ -37,6 +38,16 @@ class MediaProcessor:
         message_id = self.extract_message_id(message) or str(uuid4())
         extension = self.resolve_extension_from_mime_type(mime_type)
         return f"{message_id}{extension}"
+    
+    def _resolve_media_type(self, mime_type: str):
+        if mime_type.startswith("image/"):
+            return "image"
+        elif mime_type.startswith("audio/"):
+            return "audio"
+        elif mime_type.startswith("video/"):
+            return "video"
+        else:
+            return "document"
 
 
 class WhatsAppMedia(MediaProcessor):
@@ -73,26 +84,43 @@ class WhatsAppMedia(MediaProcessor):
             response_type="content"
         )
         return content
-
-    def upload_media(self, file_path: str, media_type: str):
+    
+    def upload_media(self, file_binary: bytes, media_type: str, mime_type: str = None, filename: str = None):
         """
         Upload a media file to WhatsApp and obtain a media ID.
 
-        :param file_path: The local path to the media file to be uploaded.
+        :param file_binary: Binary content of the file.
         :param media_type: The type of media ("image", "audio", "document").
+        :param mime_type: Optional MIME type of the file.
+        :param filename: Optional filename.
         :return: The response containing the media ID returned by the WhatsApp API.
         """
-        if media_type not in ["image", "audio", "document"]:
+        
+        if media_type not in ["image", "audio", "document", "video"]:
             raise ValueError("Invalid media type: %s" % media_type)
 
-        with open(file_path, "rb") as f:
-            files = {
-                "file": (file_path, f, mimetypes.guess_type(file_path)[0] or "application/octet-stream")
-            }
-            response = self.request(
-                method="POST",
-                endpoint="/%s/media" % self.config.phone_number_id,
-                files=files,
-                payload={"type": media_type}
+        if not mime_type:
+            mime_type = "application/octet-stream"
+
+        if not filename:
+            extension = mimetypes.guess_extension(mime_type) or ".bin"
+            filename = f"{uuid4()}{extension}"
+
+        file_buffer = io.BytesIO(file_binary)
+
+        files = {
+            "file": (
+                filename,
+                file_buffer,
+                mime_type
             )
+        }
+
+        response = self.request(
+            method="POST",
+            endpoint="/%s/media" % self.config.phone_number_id,
+            files=files,
+            payload={"type": media_type}
+        )
+
         return response
