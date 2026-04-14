@@ -97,3 +97,36 @@ class WhatsAppMessages:
             caption=caption,
             filename=file.name
         )
+    
+    def send_reply_with_reaction_message(self, recipient_id: str, message_id: str, reaction: str):
+        """
+        Send a reaction message in reply to a specific message.
+
+        :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
+        :param message_id: The ID of the message to which the reaction is being sent.
+        :param reaction: The emoji reaction to send (e.g., "👍", "❤️").
+        :return: The response returned by the WhatsApp API.
+        """
+        response = self.request(
+            method="POST",
+            endpoint="/%s/messages" % self.config.phone_number_id,
+            payload={
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": recipient_id,
+                "type": "reaction",
+                "reaction": {
+                    "message_id": message_id,
+                    "emoji": reaction
+                }
+            })
+        data = {
+            "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
+            "type": "reaction",
+            "data": {
+                "wa_id": response.get("messages", [{}])[0].get("id"),
+                "message_id": message_id,
+                "emoji": reaction
+            }
+        }
+        return data
