@@ -29,7 +29,6 @@ class WhatsAppAPIClient(
         self.session.headers.update(
             {
                 "Authorization": f"Bearer {self.config.access_token}",
-                "Content-Type": "application/json",
                 "Accept": "application/json",
             }
         )
