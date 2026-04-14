@@ -19,6 +19,7 @@ class WhatsAppAPIRequest:
         endpoint: str,
         payload: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
         response_type: Literal["json", "content", "text", "raw"] = "json",
     ):
         normalized_method = method.upper()
@@ -32,13 +33,20 @@ class WhatsAppAPIRequest:
             url = f"{self.config.base_url}/{cleaned_endpoint}"
 
         try:
-            response: Response = self.session.request(
-                method=method,
-                url=url,
-                json=payload,
-                params=params,
-                timeout=self.config.timeout,
-            )
+            request_kwargs = {
+                "method": method,
+                "url": url,
+                "params": params,
+                "timeout": self.config.timeout,
+            }
+
+            if files:
+                request_kwargs["data"] = payload
+                request_kwargs["files"] = files
+            else:
+                request_kwargs["json"] = payload
+
+            response: Response = self.session.request(**request_kwargs)
         except requests.RequestException as exc:
             raise WhatsAppHTTPError(
                 f"Network error when calling WhatsApp API: {exc}",
