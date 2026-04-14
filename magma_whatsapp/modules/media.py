@@ -109,6 +109,7 @@ class WhatsAppMedia(MediaProcessor):
             filename = f"{uuid4()}{extension}"
 
         file_buffer = io.BytesIO(file_binary)
+        file_buffer.seek(0)
 
         files = {
             "file": (

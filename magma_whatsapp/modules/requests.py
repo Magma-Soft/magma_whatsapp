@@ -41,6 +41,10 @@ class WhatsAppAPIRequest:
             }
 
             if files:
+                headers = self.session.headers.copy()
+                headers.pop("Content-Type", None)
+
+                request_kwargs["headers"] = headers
                 request_kwargs["data"] = payload
                 request_kwargs["files"] = files
             else:
