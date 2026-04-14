@@ -4,6 +4,7 @@ import io
 import mimetypes
 from uuid import uuid4
 
+
 class MediaProcessor:
 
     MIME_EXTENSION_MAP: dict[str, str] = {
@@ -38,7 +39,7 @@ class MediaProcessor:
         message_id = self.extract_message_id(message) or str(uuid4())
         extension = self.resolve_extension_from_mime_type(mime_type)
         return f"{message_id}{extension}"
-    
+
     def _resolve_media_type(self, mime_type: str):
         if mime_type.startswith("image/"):
             return "image"
@@ -84,8 +85,13 @@ class WhatsAppMedia(MediaProcessor):
             response_type="content"
         )
         return content
-    
-    def upload_media(self, file_binary: bytes, media_type: str, mime_type: str = None, filename: str = None):
+
+    def upload_media(
+        self,
+        file_binary: bytes,
+        mime_type: str = None,
+        filename: str = None
+    ):
         """
         Upload a media file to WhatsApp and obtain a media ID.
 
@@ -95,10 +101,6 @@ class WhatsAppMedia(MediaProcessor):
         :param filename: Optional filename.
         :return: The response containing the media ID returned by the WhatsApp API.
         """
-        
-        if media_type not in ["image", "audio", "document", "video"]:
-            raise ValueError("Invalid media type: %s" % media_type)
-
         if not mime_type:
             mime_type = "application/octet-stream"
 
@@ -116,11 +118,15 @@ class WhatsAppMedia(MediaProcessor):
             )
         }
 
+        data = {
+            "messaging_product": "whatsapp"
+        }
+
         response = self.request(
             method="POST",
             endpoint="/%s/media" % self.config.phone_number_id,
             files=files,
-            payload={"type": media_type}
+            payload=data
         )
 
         return response

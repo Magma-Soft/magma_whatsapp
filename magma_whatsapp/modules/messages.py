@@ -72,21 +72,15 @@ class WhatsAppMessages:
         }
         return data
 
-    def send_message_file(self, recipient_id: str, file, caption: str = None):
-        """
-        Send file uploaded from Django InMemoryUploadedFile
-        """
-
+    def send_message_file(self, recipient_id: str, file, caption=None):
         file.seek(0)
         file_binary = file.read()
 
-        mime_type = file.content_type or mimetypes.guess_type(file.name)[0]
-
+        mime_type = file.content_type
         media_type = self._resolve_media_type(mime_type)
 
         upload = self.upload_media(
             file_binary=file_binary,
-            media_type=media_type,
             mime_type=mime_type,
             filename=file.name
         )
@@ -94,14 +88,12 @@ class WhatsAppMessages:
         media_id = upload.get("id")
 
         if not media_id:
-            raise ValueError("Failed to upload media to WhatsApp")
+            raise ValueError("Failed to upload media")
 
-        response = self.send_message_media(
+        return self.send_message_media(
             recipient_id=recipient_id,
             media_id=media_id,
             media_type=media_type,
             caption=caption,
-            filename=file.name if media_type == "document" else None
+            filename=file.name
         )
-
-        return response
