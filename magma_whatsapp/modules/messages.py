@@ -6,14 +6,20 @@ from typing import Literal
 
 class WhatsAppMessages:
 
-    def send_message_text(self, recipient_id: str, message_content: str):
+    def send_message_text(self, recipient_id: str, message_content: str, reply_to_message_id: str = None):
         """
         Send a plain text WhatsApp message to a recipient.
 
         :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
         :param message_content: The text body to send in the message.
+        :param reply_to_message_id: Optional ID of the message to which this message is a reply.
         :return: The response returned by the WhatsApp API.
         """
+        if reply_to_message_id:
+            context = {"message_id": reply_to_message_id}
+        else:
+            context = None
+
         response = self.request(
             method="POST",
             endpoint="/%s/messages" % self.config.phone_number_id,
@@ -21,7 +27,8 @@ class WhatsAppMessages:
                 "messaging_product": "whatsapp",
                 "to": recipient_id,
                 "type": "text",
-                "text": {"body": message_content}
+                "text": {"body": message_content},
+                **({"context": context} if context else {})
             })
         data = {
             "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
@@ -33,7 +40,7 @@ class WhatsAppMessages:
         }
         return data
 
-    def send_message_media(self, recipient_id: str, media_id: str, media_type: Literal["image", "audio", "document"], caption: str = None, filename: str = None):
+    def send_message_media(self, recipient_id: str, media_id: str, media_type: Literal["image", "audio", "document"], caption: str = None, filename: str = None, reply_to_message_id: str = None):
         """
         Send a media message (image, audio, document) to a recipient.
 
@@ -42,10 +49,16 @@ class WhatsAppMessages:
         :param media_type: The type of media ("image", "audio", or "document").
         :param caption: Optional caption for the media message.
         :param filename: Optional filename for the media message (only for documents).
+        :param reply_to_message_id: Optional ID of the message to which this message is a reply.
         :return: The response returned by the WhatsApp API.
         """
         if media_type not in ["image", "audio", "document"]:
             raise ValueError("Invalid media type: %s" % media_type)
+
+        if reply_to_message_id:
+            context = {"message_id": reply_to_message_id}
+        else:
+            context = None
 
         response = self.request(
             method="POST",
@@ -60,6 +73,7 @@ class WhatsAppMessages:
                     **({"caption": caption} if caption else {}),
                     **({"filename": filename} if filename and media_type == "document" else {}),
                 },
+                **({"context": context} if context else {})
             })
         data = {
             "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
@@ -72,7 +86,7 @@ class WhatsAppMessages:
         }
         return data
 
-    def send_message_file(self, recipient_id: str, file, caption=None):
+    def send_message_file(self, recipient_id: str, file, caption=None, reply_to_message_id: str = None):
         file.seek(0)
         file_binary = file.read()
 
@@ -95,7 +109,8 @@ class WhatsAppMessages:
             media_id=media_id,
             media_type=media_type,
             caption=caption,
-            filename=file.name
+            filename=file.name,
+            reply_to_message_id=reply_to_message_id
         )
 
     def send_message_reaction(self, recipient_id: str, message_id: str, reaction: str):
