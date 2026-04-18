@@ -32,7 +32,7 @@ class WhatsAppMessages:
             }
         }
         return data
-    
+
     def send_message_media(self, recipient_id: str, media_id: str, media_type: Literal["image", "audio", "document"], caption: str = None, filename: str = None):
         """
         Send a media message (image, audio, document) to a recipient.
@@ -97,8 +97,8 @@ class WhatsAppMessages:
             caption=caption,
             filename=file.name
         )
-    
-    def send_reply_with_reaction_message(self, recipient_id: str, message_id: str, reaction: str):
+
+    def send_message_reaction(self, recipient_id: str, message_id: str, reaction: str):
         """
         Send a reaction message in reply to a specific message.
 
@@ -115,17 +115,13 @@ class WhatsAppMessages:
                 "recipient_type": "individual",
                 "to": recipient_id,
                 "type": "reaction",
-                "reaction": {
-                    "message_id": message_id,
-                    "emoji": reaction
-                }
+                "reaction": {"message_id": message_id, "emoji": reaction}
             })
         data = {
             "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
             "type": "reaction",
             "data": {
                 "wa_id": response.get("messages", [{}])[0].get("id"),
-                "message_id": message_id,
                 "emoji": reaction
             }
         }
