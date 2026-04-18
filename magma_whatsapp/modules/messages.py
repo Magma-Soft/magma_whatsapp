@@ -35,7 +35,8 @@ class WhatsAppMessages:
             "type": "text",
             "data": {
                 "wa_id": response.get("messages", [{}])[0].get("id"),
-                "caption": message_content
+                "caption": message_content,
+                "reply_to": reply_to_message_id
             }
         }
         return data
@@ -81,7 +82,8 @@ class WhatsAppMessages:
             "data": {
                 "wa_id": response.get("messages", [{}])[0].get("id"),
                 "caption": caption,
-                "filename": filename
+                "filename": filename,
+                "reply_to": reply_to_message_id
             }
         }
         return data
