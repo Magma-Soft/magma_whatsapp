@@ -41,19 +41,26 @@ class WhatsAppMessages:
         }
         return data
 
-    def send_message_media(self, recipient_id: str, media_id: str, media_type: Literal["image", "audio", "document"], caption: str = None, filename: str = None, reply_to_message_id: str = None):
+    def send_message_media(
+            self,
+            recipient_id: str,
+            media_id: str,
+            media_type: Literal["image", "audio", "document", "video"],
+            caption: str = None,
+            filename: str = None,
+            reply_to_message_id: str = None):
         """
-        Send a media message (image, audio, document) to a recipient.
+        Send a media message (image, audio, document, video) to a recipient.
 
         :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
         :param media_id: The ID of the media object uploaded to WhatsApp.
-        :param media_type: The type of media ("image", "audio", or "document").
+        :param media_type: The type of media ("image", "audio", "document", "video").
         :param caption: Optional caption for the media message.
         :param filename: Optional filename for the media message (only for documents).
         :param reply_to_message_id: Optional ID of the message to which this message is a reply.
         :return: The response returned by the WhatsApp API.
         """
-        if media_type not in ["image", "audio", "document"]:
+        if media_type not in ["image", "audio", "document", "video"]:
             raise ValueError("Invalid media type: %s" % media_type)
 
         if reply_to_message_id:
