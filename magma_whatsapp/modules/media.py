@@ -88,6 +88,7 @@ class WhatsAppMedia(MediaProcessor):
 
     def upload_media(
         self,
+        phone_number_id: str,
         file_binary: bytes,
         mime_type: str = None,
         filename: str = None
@@ -95,8 +96,8 @@ class WhatsAppMedia(MediaProcessor):
         """
         Upload a media file to WhatsApp and obtain a media ID.
 
+        :param phone_number_id: The phone number ID associated with the WhatsApp Business Account.
         :param file_binary: Binary content of the file.
-        :param media_type: The type of media ("image", "audio", "document").
         :param mime_type: Optional MIME type of the file.
         :param filename: Optional filename.
         :return: The response containing the media ID returned by the WhatsApp API.
@@ -125,7 +126,7 @@ class WhatsAppMedia(MediaProcessor):
 
         response = self.request(
             method="POST",
-            endpoint="/%s/media" % self.config.phone_number_id,
+            endpoint="/%s/media" % phone_number_id,
             files=files,
             payload=data
         )

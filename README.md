@@ -32,7 +32,6 @@ from magma_whatsapp import WhatsAppAPIConfig
 
 config = WhatsAppAPIConfig(
     api_version="v20.0",
-    phone_number_id="YOUR_PHONE_NUMBER_ID",
     access_token="YOUR_ACCESS_TOKEN",
     waba_id="YOUR_WABA_ID",          # optional
     graph_api_base_url="https://graph.facebook.com",  # optional, this is the default
@@ -43,7 +42,6 @@ config = WhatsAppAPIConfig(
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `api_version` | `str` | Yes | Graph API version (e.g. `"v20.0"`) |
-| `phone_number_id` | `str` | Yes | WhatsApp phone number ID |
 | `access_token` | `str` | Yes | Bearer token for authentication |
 | `waba_id` | `str` | No | WhatsApp Business Account ID |
 | `graph_api_base_url` | `str` | No | Base URL (default: `https://graph.facebook.com`) |
@@ -58,7 +56,6 @@ from magma_whatsapp import WhatsAppAPIClient, WhatsAppAPIConfig
 
 config = WhatsAppAPIConfig(
     api_version="v20.0",
-    phone_number_id="YOUR_PHONE_NUMBER_ID",
     access_token="YOUR_ACCESS_TOKEN",
 )
 
