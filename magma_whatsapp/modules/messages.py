@@ -32,6 +32,7 @@ class WhatsAppMessages:
                 **({"context": context} if context else {})
             })
         data = {
+            "phone_number_id": "%s" % phone_number_id,
             "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
             "type": "text",
             "data": {
@@ -87,6 +88,7 @@ class WhatsAppMessages:
                 **({"context": context} if context else {})
             })
         data = {
+            "phone_number_id": "%s" % phone_number_id,
             "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
             "type": media_type,
             "data": {
@@ -158,6 +160,7 @@ class WhatsAppMessages:
                 "reaction": {"message_id": message_id, "emoji": reaction}
             })
         data = {
+            "phone_number_id": "%s" % phone_number_id,
             "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
             "type": "reaction",
             "data": {
