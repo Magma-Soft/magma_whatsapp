@@ -30,6 +30,7 @@ class WhatsAppWebhookProcessor:
         return {
             "name": profile.get("name") or profile.get("username"),
             "wa_id": contact.get("wa_id"),
+            "user_id": contact.get("user_id"),
         }
 
     def get_message_id(self, payload: dict) -> str:
