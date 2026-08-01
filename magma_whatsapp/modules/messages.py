@@ -34,7 +34,8 @@ class WhatsAppMessages:
             })
         data = {
             "phone_number_id": "%s" % phone_number_id,
-            "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
+            "to": response.get("contacts", [{}])[0].get("wa_id"),
+            "recipient_id": response.get("contacts", [{}])[0].get("user_id"),
             "type": "text",
             "data": {
                 "wa_id": response.get("messages", [{}])[0].get("id"),
@@ -92,7 +93,8 @@ class WhatsAppMessages:
             })
         data = {
             "phone_number_id": "%s" % phone_number_id,
-            "recipient_id": response.get("contacts", [{}])[0].get("wa_id"),
+            "to": response.get("contacts", [{}])[0].get("wa_id"),
+            "recipient_id": response.get("contacts", [{}])[0].get("user_id"),
             "type": media_type,
             "data": {
                 "wa_id": response.get("messages", [{}])[0].get("id"),
