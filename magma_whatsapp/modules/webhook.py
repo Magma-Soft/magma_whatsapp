@@ -21,14 +21,16 @@ class WhatsAppWebhookProcessor:
             return payload["statuses"][0].get("type")
         return "unknown"
 
-    def get_contact_info(self, payload: dict) -> dict:
-        if payload.get("contacts", None):
-            contact = payload["contacts"][0]
-            return {
-                "name": contact.get("profile", {}).get("name"),
-                "wa_id": contact.get("wa_id"),
-            }
-        return None
+    def get_contact_info(self, payload: dict) -> dict | None:
+        contacts = payload.get("contacts")
+        if not contacts:
+            return None
+        contact = contacts[0]
+        profile = contact.get("profile", {})
+        return {
+            "name": profile.get("name") or profile.get("username"),
+            "wa_id": contact.get("wa_id"),
+        }
 
     def get_message_id(self, payload: dict) -> str:
         if payload.get("messages", None):
