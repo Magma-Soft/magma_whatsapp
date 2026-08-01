@@ -6,12 +6,13 @@ from typing import Literal
 
 class WhatsAppMessages:
 
-    def send_message_text(self, phone_number_id: str, recipient_id: str, message_content: str, reply_to_message_id: str = None):
+    def send_message_text(self, phone_number_id: str = None, to_phone: str = None, recipient_id: str = None, message_content: str = None, reply_to_message_id: str = None):
         """
         Send a plain text WhatsApp message to a recipient.
 
         :param phone_number_id: The phone number ID associated with the WhatsApp Business Account.
-        :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
+        :param to_phone: The phone number of the recipient in international format.
+        :param recipient_id: The BSUID of the recipient.
         :param message_content: The text body to send in the message.
         :param reply_to_message_id: Optional ID of the message to which this message is a reply.
         :return: The response returned by the WhatsApp API.
@@ -26,7 +27,7 @@ class WhatsAppMessages:
             endpoint="/%s/messages" % phone_number_id,
             payload={
                 "messaging_product": "whatsapp",
-                "to": recipient_id,
+                **({"to": to_phone} if to_phone else {"recipient": recipient_id}),
                 "type": "text",
                 "text": {"body": message_content},
                 **({"context": context} if context else {})
@@ -46,9 +47,10 @@ class WhatsAppMessages:
     def send_message_media(
             self,
             phone_number_id: str,
-            recipient_id: str,
             media_id: str,
             media_type: Literal["image", "audio", "document", "video"],
+            to_phone: str = None,
+            recipient_id: str = None,
             caption: str = None,
             filename: str = None,
             reply_to_message_id: str = None):
@@ -56,7 +58,8 @@ class WhatsAppMessages:
         Send a media message (image, audio, document, video) to a recipient.
 
         :param phone_number_id: The phone number ID associated with the WhatsApp Business Account.
-        :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
+        :param to_phone: The phone number of the recipient in international format.
+        :param recipient_id: The BSUID of the recipient.
         :param media_id: The ID of the media object uploaded to WhatsApp.
         :param media_type: The type of media ("image", "audio", "document", "video").
         :param caption: Optional caption for the media message.
@@ -78,7 +81,7 @@ class WhatsAppMessages:
             payload={
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
-                "to": recipient_id,
+                **({"to": to_phone} if to_phone else {"recipient": recipient_id}),
                 "type": media_type,
                 media_type: {
                     "id": media_id,
@@ -100,12 +103,13 @@ class WhatsAppMessages:
         }
         return data
 
-    def send_message_file(self, phone_number_id: str, recipient_id: str, file, caption=None, reply_to_message_id: str = None):
+    def send_message_file(self, phone_number_id: str = None, to_phone: str = None, recipient_id: str = None, file=None, caption=None, reply_to_message_id: str = None):
         """
         Send a file message to a recipient. This method handles the upload of the file and then sends it as a media message.
-        
+
         :param phone_number_id: The phone number ID associated with the WhatsApp Business Account.
-        :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
+        :param to_phone: The phone number of the recipient in international format.
+        :param recipient_id: The BSUID of the recipient.
         :param file: A file-like object containing the binary content of the file.
         :param caption: Optional caption for the file message.
         :param reply_to_message_id: Optional ID of the message to which this message is a reply.
@@ -131,6 +135,7 @@ class WhatsAppMessages:
 
         return self.send_message_media(
             phone_number_id=phone_number_id,
+            to_phone=to_phone,
             recipient_id=recipient_id,
             media_id=media_id,
             media_type=media_type,
@@ -139,12 +144,13 @@ class WhatsAppMessages:
             reply_to_message_id=reply_to_message_id
         )
 
-    def send_message_reaction(self, phone_number_id: str, recipient_id: str, message_id: str, reaction: str):
+    def send_message_reaction(self, phone_number_id: str, to_phone: str = None, recipient_id: str = None, message_id: str = None, reaction: str = None):
         """
         Send a reaction message in reply to a specific message.
 
         :param phone_number_id: The phone number ID associated with the WhatsApp Business Account.
-        :param recipient_id: The WhatsApp ID of the recipient (e.g., phone number in international format).
+        :param to_phone: The phone number of the recipient in international format.
+        :param recipient_id: The BSUID of the recipient.
         :param message_id: The ID of the message to which the reaction is being sent.
         :param reaction: The emoji reaction to send (e.g., "👍", "❤️").
         :return: The response returned by the WhatsApp API.
@@ -155,7 +161,7 @@ class WhatsAppMessages:
             payload={
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
-                "to": recipient_id,
+                **({"to": to_phone} if to_phone else {"recipient": recipient_id}),
                 "type": "reaction",
                 "reaction": {"message_id": message_id, "emoji": reaction}
             })
