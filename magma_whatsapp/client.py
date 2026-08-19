@@ -7,7 +7,8 @@ from .modules import (
     WhatsAppMessages,
     WhatsAppMedia,
     WhatsAppAPIRequest,
-    WhatsAppWebhookProcessor
+    WhatsAppWebhookProcessor,
+    WhatsAppTemplates
 )
 
 
@@ -15,7 +16,8 @@ class WhatsAppAPIClient(
     WhatsAppAPIRequest,
     WhatsAppMessages,
     WhatsAppMedia,
-    WhatsAppWebhookProcessor
+    WhatsAppWebhookProcessor,
+    WhatsAppTemplates
 ):
 
     def __init__(
