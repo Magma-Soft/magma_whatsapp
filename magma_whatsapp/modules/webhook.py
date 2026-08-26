@@ -107,6 +107,7 @@ class WhatsAppWebhookProcessor:
         return {
             "message_id": self.get_message_id(payload),
             "status": self.get_send_status(payload),
+            "contact": self.get_contact_info(payload),
         }
 
     def get_phone_number_id(self, payload: dict) -> str:
