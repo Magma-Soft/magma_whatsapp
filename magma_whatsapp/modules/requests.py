@@ -23,6 +23,7 @@ class WhatsAppAPIRequest:
         response_type: Literal["json", "content", "text", "raw"] = "json",
     ):
         normalized_method = method.upper()
+
         if normalized_method not in AllowedMethod.__args__:
             raise ValueError(f"HTTP method not allowed: {method}")
 
@@ -51,6 +52,7 @@ class WhatsAppAPIRequest:
                 request_kwargs["json"] = payload
 
             response: Response = self.session.request(**request_kwargs)
+
         except requests.RequestException as exc:
             raise WhatsAppHTTPError(
                 f"Network error when calling WhatsApp API: {exc}",
@@ -60,46 +62,31 @@ class WhatsAppAPIRequest:
             ) from exc
 
         if not response.ok:
-            response_body: Any
             try:
                 response_body = response.json()
             except ValueError:
                 response_body = response.text
 
             raise WhatsAppHTTPError(
-                "WhatsApp API returned an HTTP error",
+                (
+                    f"WhatsApp API returned an HTTP error "
+                    f"{response.status_code}: {response_body}"
+                ),
                 status_code=response.status_code,
-                endpoint=cleaned_endpoint,
+                endpoint=endpoint,
                 response_body=response_body,
             )
 
         if response_type == "json":
-            try:
-                parsed_response = response.json()
-            except ValueError as exc:
-                raise WhatsAppResponseError(
-                    "Invalid response: expected JSON",
-                    endpoint=cleaned_endpoint,
-                    response_body=response.text,
-                ) from exc
+            return response.json()
 
-            if not isinstance(parsed_response, dict):
-                raise WhatsAppResponseError(
-                    "Invalid response: expected JSON object",
-                    endpoint=cleaned_endpoint,
-                    response_body=parsed_response,
-                )
-
-            return parsed_response
-
-        elif response_type == "content":
+        if response_type == "content":
             return response.content
 
-        elif response_type == "text":
+        if response_type == "text":
             return response.text
 
-        elif response_type == "raw":
+        if response_type == "raw":
             return response
 
-        else:
-            raise ValueError(f"Unsupported response_type: {response_type}")
+        raise ValueError(f"Unsupported response_type: {response_type}")
